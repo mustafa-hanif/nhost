@@ -16,8 +16,8 @@
 import gql from 'graphql-tag';
 
 const SUBSCRIPTION_TEAMS = gql`
-subscription {
-  teams {
+subscription ($userId: uuid!) {
+  teams (where: { owner_user_id: { _eq: $userId}}) {
     id
     name
   }
@@ -45,6 +45,12 @@ export default {
     $subscribe: {
       teams_updated: {
         query: SUBSCRIPTION_TEAMS,
+        variables () {
+          // console.log(JSON.stringify(this.$nhost.auth, null, 2))
+          return {
+            userId: this.$nhost.auth.user().id
+          }
+        },
         result({data}) {
           this.teams = data.teams;
         }
